@@ -13,17 +13,10 @@
     <title>LocalSync AR</title>
 
 
-    <!-- =========================================
-         A-FRAME 1.5.0
-    ========================================== -->
-
+    <!-- A-Frame 1.5.0 -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-
-    <!-- =========================================
-         MINDAR 1.2.5
-    ========================================== -->
-
+    <!-- MindAR 1.2.5 -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 
@@ -78,7 +71,7 @@
 
 
         <!-- =====================================
-             CAMERA
+             CAMERA + MOBILE CURSOR
         ====================================== -->
 
         <a-camera
@@ -87,11 +80,23 @@
 
             look-controls="enabled: false"
 
-            cursor="rayOrigin: mouse; fuse: false"
+        >
 
-            raycaster="objects: .ar-button"
+            <!--
+                A-Frame cursor creates the
+                synthetic click events used
+                by our AR buttons.
+            -->
 
-        ></a-camera>
+            <a-cursor
+
+                fuse="false"
+
+                raycaster="objects: .ar-button; far: 10"
+
+            ></a-cursor>
+
+        </a-camera>
 
 
 
@@ -224,7 +229,7 @@
             ></a-plane>
 
 
-            <!-- VISIT WEBSITE TEXT -->
+            <!-- WEBSITE TEXT -->
 
             <a-text
 
@@ -258,7 +263,7 @@
 
 
         /* ========================================
-           WEBSITE
+           WEBSITE URL
         ======================================== */
 
         const WEBSITE_URL =
@@ -266,10 +271,7 @@
 
 
         /* ========================================
-           APP
-
-           We will connect the real Flutter
-           deep link later.
+           APP URL
         ======================================== */
 
         const APP_URL = "";
@@ -282,7 +284,6 @@
 
         const openAppButton =
             document.querySelector("#openAppAR");
-
 
         const websiteButton =
             document.querySelector("#websiteAR");
@@ -300,7 +301,7 @@
             () => {
 
                 console.log(
-                    "LocalSync AR: Open App clicked"
+                    "LocalSync AR: OPEN APP clicked"
                 );
 
 
@@ -336,7 +337,7 @@
             () => {
 
                 console.log(
-                    "LocalSync AR: Website clicked"
+                    "LocalSync AR: VISIT WEBSITE clicked"
                 );
 
 
@@ -350,7 +351,7 @@
 
 
         /* ========================================
-           BUTTON HOVER EFFECT
+           OPEN APP HOVER / POINTER FEEDBACK
         ======================================== */
 
         openAppButton.addEventListener(
@@ -385,6 +386,10 @@
         );
 
 
+
+        /* ========================================
+           WEBSITE HOVER / POINTER FEEDBACK
+        ======================================== */
 
         websiteButton.addEventListener(
 
