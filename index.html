@@ -10,22 +10,22 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes"
-    >
-
     <title>LocalSync AR</title>
 
 
-    <!-- A-FRAME -->
+    <!-- =========================================
+         THREE.JS + MINDAR
+    ========================================== -->
 
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-
-    <!-- MINDAR -->
-
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+        }
+    }
+    </script>
 
 
     <style>
@@ -43,22 +43,71 @@
 
             background: #000;
 
+            font-family: Arial, sans-serif;
+
         }
 
 
-        /* ======================================
-           START SCREEN
-        ====================================== */
+        /* =========================================
+           AR CONTAINER
+        ========================================== */
 
-        #startScreen {
+        #container {
 
             position: fixed;
 
             top: 0;
             left: 0;
 
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: #000;
+
+        }
+
+
+        #container video {
+
+            position: absolute !important;
+
+            top: 0 !important;
+            left: 0 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+            object-fit: cover !important;
+
+        }
+
+
+        #container canvas {
+
+            position: absolute !important;
+
+            top: 0 !important;
+            left: 0 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+        }
+
+
+        /* =========================================
+           START SCREEN
+        ========================================== */
+
+        #startScreen {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 100;
 
             display: flex;
 
@@ -68,19 +117,17 @@
 
             justify-content: center;
 
+            text-align: center;
+
+            color: white;
+
             background:
                 radial-gradient(
                     circle at center,
                     #10283b 0%,
                     #050b12 60%,
-                    #000000 100%
+                    #000 100%
                 );
-
-            color: white;
-
-            text-align: center;
-
-            z-index: 9999;
 
         }
 
@@ -89,7 +136,7 @@
 
             margin: 0 0 12px;
 
-            font-size: 32px;
+            font-size: 34px;
 
             letter-spacing: 1px;
 
@@ -102,9 +149,9 @@
 
             color: #b9c8d5;
 
-            font-size: 15px;
-
             line-height: 1.5;
+
+            font-size: 15px;
 
         }
 
@@ -115,7 +162,7 @@
 
             border-radius: 14px;
 
-            padding: 15px 34px;
+            padding: 15px 36px;
 
             background: #176dcc;
 
@@ -127,8 +174,6 @@
 
             cursor: pointer;
 
-            -webkit-tap-highlight-color: transparent;
-
         }
 
 
@@ -139,9 +184,9 @@
         }
 
 
-        /* ======================================
+        /* =========================================
            STATUS
-        ====================================== */
+        ========================================== */
 
         #status {
 
@@ -153,62 +198,177 @@
 
             transform: translateX(-50%);
 
-            z-index: 9000;
+            z-index: 90;
 
             display: none;
 
-            padding: 10px 16px;
+            padding: 9px 16px;
 
             border-radius: 20px;
 
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.70);
 
             color: white;
 
             font-size: 13px;
 
-            text-align: center;
-
-            max-width: 85%;
+            white-space: nowrap;
 
         }
 
 
-        /* ======================================
+        /* =========================================
+           SCAN MESSAGE
+        ========================================== */
+
+        #scanMessage {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 30px;
+
+            transform: translateX(-50%);
+
+            z-index: 80;
+
+            display: none;
+
+            padding: 10px 18px;
+
+            border-radius: 20px;
+
+            background: rgba(0, 0, 0, 0.65);
+
+            color: white;
+
+            font-size: 14px;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =========================================
+           AR ACTION PANEL
+        ========================================== */
+
+        #actionPanel {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 55px;
+
+            transform: translateX(-50%);
+
+            z-index: 80;
+
+            display: none;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            width: 210px;
+
+        }
+
+
+        .actionButton {
+
+            width: 100%;
+
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 13px 20px;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.35);
+
+        }
+
+
+        #openAppButton {
+
+            background: #176dcc;
+
+        }
+
+
+        #websiteButton {
+
+            background: #152b45;
+
+        }
+
+
+        .actionButton:active {
+
+            transform: scale(0.96);
+
+        }
+
+
+        /* =========================================
            ERROR
-        ====================================== */
+        ========================================== */
 
         #errorBox {
 
             position: fixed;
 
-            top: 50%;
-            left: 50%;
+            inset: 0;
 
-            transform: translate(-50%, -50%);
+            z-index: 200;
 
-            width: 82%;
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 25px;
+
+            background: rgba(0, 0, 0, 0.88);
+
+        }
+
+
+        #errorCard {
+
+            width: 100%;
 
             max-width: 360px;
 
-            padding: 22px;
+            padding: 25px;
 
             border-radius: 18px;
 
-            background: rgba(5, 10, 16, 0.96);
+            background: #07111d;
 
             color: white;
 
             text-align: center;
 
-            z-index: 10000;
-
-            display: none;
-
         }
 
 
-        #errorBox h2 {
+        #errorCard h2 {
 
             margin-top: 0;
 
@@ -230,8 +390,6 @@
 
         #retryButton {
 
-            margin-top: 10px;
-
             border: none;
 
             border-radius: 10px;
@@ -246,18 +404,6 @@
 
         }
 
-
-        /* ======================================
-           A-FRAME
-        ====================================== */
-
-        a-scene {
-
-            width: 100%;
-            height: 100%;
-
-        }
-
     </style>
 
 </head>
@@ -266,9 +412,16 @@
 <body>
 
 
-    <!-- ======================================
+    <!-- =========================================
+         AR CONTAINER
+    ========================================== -->
+
+    <div id="container"></div>
+
+
+    <!-- =========================================
          START SCREEN
-    ====================================== -->
+    ========================================== -->
 
     <div id="startScreen">
 
@@ -286,218 +439,109 @@
     </div>
 
 
-    <!-- ======================================
+    <!-- =========================================
          STATUS
-    ====================================== -->
+    ========================================== -->
 
     <div id="status">
         Starting camera...
     </div>
 
 
-    <!-- ======================================
-         ERROR BOX
-    ====================================== -->
+    <!-- =========================================
+         SCAN MESSAGE
+    ========================================== -->
 
-    <div id="errorBox">
+    <div id="scanMessage">
+        Point the camera at your LocalSync card
+    </div>
 
-        <h2>Camera Error</h2>
 
-        <p id="errorText">
-            Unable to start the camera.
-        </p>
+    <!-- =========================================
+         ACTIONS
+    ========================================== -->
 
-        <button id="retryButton">
-            TRY AGAIN
+    <div id="actionPanel">
+
+        <button
+            id="openAppButton"
+            class="actionButton"
+        >
+            OPEN APP
+        </button>
+
+
+        <button
+            id="websiteButton"
+            class="actionButton"
+        >
+            VISIT WEBSITE
         </button>
 
     </div>
 
 
-    <!-- ======================================
-         MINDAR SCENE
-    ====================================== -->
+    <!-- =========================================
+         ERROR
+    ========================================== -->
 
-    <a-scene
+    <div id="errorBox">
 
-        id="arScene"
+        <div id="errorCard">
 
-        mindar-image="
-            imageTargetSrc: ./targets/localsync-card.mind;
-            maxTrack: 1;
-            autoStart: false;
-            uiLoading: yes;
-            uiScanning: yes;
-            uiError: yes;
-        "
+            <h2>AR Camera Error</h2>
 
-        color-space="sRGB"
+            <p id="errorText">
+                Unable to start LocalSync AR.
+            </p>
 
-        renderer="colorManagement: true, physicallyCorrectLights"
+            <button id="retryButton">
+                TRY AGAIN
+            </button>
 
-        vr-mode-ui="enabled: false"
+        </div>
 
-        device-orientation-permission-ui="enabled: false"
+    </div>
 
-    >
 
+    <!-- =========================================
+         THREE.JS / MINDAR
+    ========================================== -->
 
-        <!-- CAMERA -->
+    <script type="module">
 
-        <a-camera
+        import * as THREE from "three";
 
-            position="0 0 0"
+        import {
+            MindARThree
+        } from "mindar-image-three";
 
-            look-controls="enabled: false"
 
-        ></a-camera>
+        /* ========================================
+           CONFIGURATION
+        ======================================== */
 
-
-        <!-- ==================================
-             LOCALSYNC TARGET
-        ================================== -->
-
-        <a-entity
-
-            id="localSyncTarget"
-
-            mindar-image-target="targetIndex: 0"
-
-        >
-
-
-            <!-- LOCALSYNC -->
-
-            <a-text
-
-                value="LocalSync"
-
-                position="0 0.20 0.10"
-
-                align="center"
-
-                width="0.95"
-
-                color="#8fd3ff"
-
-                side="double"
-
-            ></a-text>
-
-
-            <!-- TAGLINE -->
-
-            <a-text
-
-                value="LOCAL • CONNECTED • SMART"
-
-                position="0 0.08 0.10"
-
-                align="center"
-
-                width="0.55"
-
-                color="#c5d3e0"
-
-                side="double"
-
-            ></a-text>
-
-
-            <!-- OPEN APP -->
-
-            <a-plane
-
-                id="openAppButton"
-
-                class="clickable"
-
-                position="0 -0.08 0.10"
-
-                width="0.65"
-
-                height="0.15"
-
-                color="#1669c9"
-
-            ></a-plane>
-
-
-            <a-text
-
-                value="OPEN APP"
-
-                position="0 -0.08 0.12"
-
-                align="center"
-
-                width="0.52"
-
-                color="#ffffff"
-
-                side="double"
-
-            ></a-text>
-
-
-            <!-- VISIT WEBSITE -->
-
-            <a-plane
-
-                id="websiteButton"
-
-                class="clickable"
-
-                position="0 -0.27 0.10"
-
-                width="0.65"
-
-                height="0.15"
-
-                color="#152b45"
-
-            ></a-plane>
-
-
-            <a-text
-
-                value="VISIT WEBSITE"
-
-                position="0 -0.27 0.12"
-
-                align="center"
-
-                width="0.48"
-
-                color="#ffffff"
-
-                side="double"
-
-            ></a-text>
-
-
-        </a-entity>
-
-
-    </a-scene>
-
-
-    <!-- ======================================
-         JAVASCRIPT
-    ====================================== -->
-
-    <script>
+        const TARGET_URL =
+            "./targets/localsync-card.mind";
 
 
         const WEBSITE_URL =
             "https://s-j-pavankumar.github.io/LocalSync_AR/website.html";
 
 
+        /*
+         * Real Flutter deep link will be added later.
+         */
+
         const APP_URL = "";
 
 
-        const scene =
-            document.querySelector("#arScene");
+        /* ========================================
+           HTML ELEMENTS
+        ======================================== */
+
+        const container =
+            document.querySelector("#container");
 
 
         const startScreen =
@@ -512,6 +556,22 @@
             document.querySelector("#status");
 
 
+        const scanMessage =
+            document.querySelector("#scanMessage");
+
+
+        const actionPanel =
+            document.querySelector("#actionPanel");
+
+
+        const openAppButton =
+            document.querySelector("#openAppButton");
+
+
+        const websiteButton =
+            document.querySelector("#websiteButton");
+
+
         const errorBox =
             document.querySelector("#errorBox");
 
@@ -524,53 +584,381 @@
             document.querySelector("#retryButton");
 
 
-        const websiteButton =
-            document.querySelector("#websiteButton");
+        /* ========================================
+           MINDAR
+        ======================================== */
+
+        let mindarThree = null;
+
+        let targetAnchor = null;
 
 
-        const openAppButton =
-            document.querySelector("#openAppButton");
+        /* ========================================
+           CREATE AR
+        ======================================== */
 
+        function createAR() {
 
-        let arSystem = null;
-
-
-        /* ======================================
-           GET MINDAR SYSTEM
-        ====================================== */
-
-        scene.addEventListener(
-            "loaded",
-            () => {
-
-                console.log(
-                    "LocalSync: A-Frame loaded"
-                );
-
-
-                arSystem =
-                    scene.systems[
-                        "mindar-image-system"
-                    ];
-
-            }
-        );
-
-
-        /* ======================================
-           SHOW ERROR
-        ====================================== */
-
-        function showError(message) {
-
-            console.error(
-                "LocalSync AR ERROR:",
-                message
+            console.log(
+                "LocalSync: creating MindARThree"
             );
 
 
-            status.style.display =
-                "none";
+            mindarThree =
+                new MindARThree({
+
+                    container: container,
+
+                    imageTargetSrc:
+                        TARGET_URL,
+
+                    maxTrack: 1,
+
+                    uiLoading: "no",
+
+                    uiScanning: "no",
+
+                    uiError: "no"
+
+                });
+
+
+            /*
+             * Three.js objects
+             */
+
+            const {
+                renderer,
+                scene,
+                camera
+            } = mindarThree;
+
+
+            renderer.setPixelRatio(
+                Math.min(
+                    window.devicePixelRatio,
+                    2
+                )
+            );
+
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+
+
+            /*
+             * Transparent renderer
+             */
+
+            renderer.setClearColor(
+                0x000000,
+                0
+            );
+
+
+            /* =====================================
+               TARGET ANCHOR
+            ===================================== */
+
+            targetAnchor =
+                mindarThree.addAnchor(0);
+
+
+            /*
+             * Create a simple premium AR panel.
+             */
+
+            const panelGeometry =
+                new THREE.PlaneGeometry(
+                    0.72,
+                    0.40
+                );
+
+
+            const panelMaterial =
+                new THREE.MeshBasicMaterial({
+
+                    color: 0x07111d,
+
+                    transparent: true,
+
+                    opacity: 0.92,
+
+                    side: THREE.DoubleSide
+
+                });
+
+
+            const panel =
+                new THREE.Mesh(
+                    panelGeometry,
+                    panelMaterial
+                );
+
+
+            panel.position.set(
+                0,
+                0,
+                0.08
+            );
+
+
+            targetAnchor.group.add(
+                panel
+            );
+
+
+            /*
+             * LocalSync title
+             */
+
+            const titleTexture =
+                createTextTexture(
+                    "LocalSync",
+                    "#8fd3ff",
+                    900,
+                    180
+                );
+
+
+            const titleMaterial =
+                new THREE.MeshBasicMaterial({
+
+                    map: titleTexture,
+
+                    transparent: true,
+
+                    side: THREE.DoubleSide
+
+                });
+
+
+            const title =
+                new THREE.Mesh(
+
+                    new THREE.PlaneGeometry(
+                        0.58,
+                        0.115
+                    ),
+
+                    titleMaterial
+
+                );
+
+
+            title.position.set(
+                0,
+                0.105,
+                0.095
+            );
+
+
+            targetAnchor.group.add(
+                title
+            );
+
+
+            /*
+             * Tagline
+             */
+
+            const taglineTexture =
+                createTextTexture(
+                    "LOCAL • CONNECTED • SMART",
+                    "#c5d3e0",
+                    1000,
+                    120
+                );
+
+
+            const taglineMaterial =
+                new THREE.MeshBasicMaterial({
+
+                    map: taglineTexture,
+
+                    transparent: true,
+
+                    side: THREE.DoubleSide
+
+                });
+
+
+            const tagline =
+                new THREE.Mesh(
+
+                    new THREE.PlaneGeometry(
+                        0.55,
+                        0.065
+                    ),
+
+                    taglineMaterial
+
+                );
+
+
+            tagline.position.set(
+                0,
+                0.035,
+                0.095
+            );
+
+
+            targetAnchor.group.add(
+                tagline
+            );
+
+
+            /*
+             * Target found
+             */
+
+            targetAnchor.onTargetFound = () => {
+
+                console.log(
+                    "LocalSync: TARGET FOUND"
+                );
+
+
+                scanMessage.style.display =
+                    "none";
+
+
+                actionPanel.style.display =
+                    "flex";
+
+            };
+
+
+            /*
+             * Target lost
+             */
+
+            targetAnchor.onTargetLost = () => {
+
+                console.log(
+                    "LocalSync: TARGET LOST"
+                );
+
+
+                actionPanel.style.display =
+                    "none";
+
+
+                scanMessage.style.display =
+                    "block";
+
+            };
+
+
+            /*
+             * Resize
+             */
+
+            window.addEventListener(
+                "resize",
+                () => {
+
+                    renderer.setSize(
+                        window.innerWidth,
+                        window.innerHeight
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* ========================================
+           TEXT TEXTURE
+        ======================================== */
+
+        function createTextTexture(
+            text,
+            color,
+            width,
+            height
+        ) {
+
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
+
+
+            canvas.width =
+                width;
+
+            canvas.height =
+                height;
+
+
+            const ctx =
+                canvas.getContext(
+                    "2d"
+                );
+
+
+            ctx.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            ctx.fillStyle =
+                color;
+
+
+            ctx.font =
+                "bold 90px Arial";
+
+
+            ctx.textAlign =
+                "center";
+
+
+            ctx.textBaseline =
+                "middle";
+
+
+            ctx.fillText(
+                text,
+                width / 2,
+                height / 2
+            );
+
+
+            const texture =
+                new THREE.CanvasTexture(
+                    canvas
+                );
+
+
+            texture.needsUpdate =
+                true;
+
+
+            return texture;
+
+        }
+
+
+        /* ========================================
+           ERROR
+        ======================================== */
+
+        function showError(
+            message
+        ) {
+
+            console.error(
+                "LocalSync:",
+                message
+            );
 
 
             errorText.textContent =
@@ -578,273 +966,90 @@
 
 
             errorBox.style.display =
-                "block";
-
-        }
+                "flex";
 
 
-        /* ======================================
-           HIDE ERROR
-        ====================================== */
-
-        function hideError() {
-
-            errorBox.style.display =
+            status.style.display =
                 "none";
 
         }
 
 
-        /* ======================================
-           FIND MINDAR VIDEO
-        ====================================== */
-
-        function getMindARVideo() {
-
-            const videos =
-                document.querySelectorAll(
-                    "video"
-                );
-
-
-            console.log(
-                "LocalSync: videos found =",
-                videos.length
-            );
-
-
-            if (videos.length === 0) {
-
-                return null;
-
-            }
-
-
-            return videos[0];
-
-        }
-
-
-        /* ======================================
-           FORCE VIDEO PLAY
-        ====================================== */
-
-        async function forceVideoPlay() {
-
-            const video =
-                getMindARVideo();
-
-
-            if (!video) {
-
-                throw new Error(
-                    "MindAR started, but no camera video element was created."
-                );
-
-            }
-
-
-            console.log(
-                "LocalSync: video element found"
-            );
-
-
-            console.log(
-                "Video readyState:",
-                video.readyState
-            );
-
-
-            console.log(
-                "Video paused:",
-                video.paused
-            );
-
-
-            console.log(
-                "Video dimensions:",
-                video.videoWidth,
-                "x",
-                video.videoHeight
-            );
-
-
-            /*
-             * Mobile browser requirements
-             */
-
-            video.autoplay =
-                true;
-
-            video.muted =
-                true;
-
-            video.playsInline =
-                true;
-
-            video.setAttribute(
-                "autoplay",
-                ""
-            );
-
-            video.setAttribute(
-                "muted",
-                ""
-            );
-
-            video.setAttribute(
-                "playsinline",
-                ""
-            );
-
-
-            /*
-             * Explicitly play camera video.
-             */
-
-            try {
-
-                await video.play();
-
-                console.log(
-                    "LocalSync: video.play() SUCCESS"
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "LocalSync: video.play() FAILED",
-                    error
-                );
-
-
-                throw new Error(
-                    "Camera stream exists but the browser refused to play it: "
-                    +
-                    error.message
-                );
-
-            }
-
-
-            /*
-             * Verify actual video dimensions.
-             */
-
-            if (
-                video.videoWidth === 0 ||
-                video.videoHeight === 0
-            ) {
-
-                console.warn(
-                    "LocalSync: video has no dimensions yet."
-                );
-
-            }
-
-
-            return video;
-
-        }
-
-
-        /* ======================================
+        /* ========================================
            START AR
-        ====================================== */
+        ======================================== */
 
         async function startAR() {
 
-            hideError();
-
-
-            startButton.disabled =
-                true;
-
-
-            startButton.textContent =
-                "STARTING...";
-
-
-            status.style.display =
-                "block";
-
-
-            status.textContent =
-                "Requesting camera...";
-
-
             try {
 
-
-                /*
-                 * Get MindAR system
-                 */
-
-                if (!arSystem) {
-
-                    arSystem =
-                        scene.systems[
-                            "mindar-image-system"
-                        ];
-
-                }
+                startButton.disabled =
+                    true;
 
 
-                if (!arSystem) {
-
-                    throw new Error(
-                        "MindAR system could not be created."
-                    );
-
-                }
+                startButton.textContent =
+                    "STARTING...";
 
 
-                /*
-                 * Start MindAR
-                 */
-
-                console.log(
-                    "LocalSync: starting MindAR..."
-                );
-
-
-                await arSystem.start();
-
-
-                console.log(
-                    "LocalSync: MindAR start completed"
-                );
+                status.style.display =
+                    "block";
 
 
                 status.textContent =
-                    "Activating camera...";
+                    "Starting camera...";
 
 
                 /*
-                 * Give the video element
-                 * a moment to be created.
+                 * Create only once.
                  */
 
-                await new Promise(
-                    resolve =>
-                        setTimeout(
-                            resolve,
-                            300
-                        )
+                if (!mindarThree) {
+
+                    createAR();
+
+                }
+
+
+                /*
+                 * Start MindAR.
+                 *
+                 * This is the official
+                 * Three.js lifecycle.
+                 */
+
+                await mindarThree.start();
+
+
+                console.log(
+                    "LocalSync: MindAR started"
                 );
 
 
                 /*
-                 * Explicitly play video.
+                 * Start rendering.
                  */
 
-                await forceVideoPlay();
+                const {
+                    renderer,
+                    scene,
+                    camera
+                } = mindarThree;
+
+
+                renderer.setAnimationLoop(
+                    () => {
+
+                        renderer.render(
+                            scene,
+                            camera
+                        );
+
+                    }
+                );
 
 
                 /*
-                 * Camera is now running.
+                 * Hide start screen.
                  */
 
                 startScreen.style.display =
@@ -855,18 +1060,27 @@
                     "none";
 
 
-                console.log(
-                    "LocalSync: CAMERA ACTIVE"
-                );
+                scanMessage.style.display =
+                    "block";
 
+
+                console.log(
+                    "LocalSync: AR CAMERA ACTIVE"
+                );
 
             }
 
             catch (error) {
 
+                console.error(
+                    "LocalSync AR startup failed:",
+                    error
+                );
+
+
                 showError(
-                    error.message ||
-                    "Unable to start the camera."
+                    error?.message ||
+                    "MindAR could not start."
                 );
 
 
@@ -882,9 +1096,9 @@
         }
 
 
-        /* ======================================
+        /* ========================================
            START BUTTON
-        ====================================== */
+        ======================================== */
 
         startButton.addEventListener(
             "click",
@@ -892,96 +1106,23 @@
         );
 
 
-        /* ======================================
+        /* ========================================
            RETRY
-        ====================================== */
+        ======================================== */
 
         retryButton.addEventListener(
             "click",
             () => {
 
-                hideError();
-
-                startAR();
+                location.reload();
 
             }
         );
 
 
-        /* ======================================
-           AR READY
-        ====================================== */
-
-        scene.addEventListener(
-            "arReady",
-            () => {
-
-                console.log(
-                    "LocalSync: AR READY"
-                );
-
-            }
-        );
-
-
-        /* ======================================
-           AR ERROR
-        ====================================== */
-
-        scene.addEventListener(
-            "arError",
-            event => {
-
-                console.error(
-                    "LocalSync: AR ERROR",
-                    event
-                );
-
-            }
-        );
-
-
-        /* ======================================
-           TARGET FOUND
-        ====================================== */
-
-        const target =
-            document.querySelector(
-                "#localSyncTarget"
-            );
-
-
-        target.addEventListener(
-            "targetFound",
-            () => {
-
-                console.log(
-                    "LocalSync: TARGET FOUND"
-                );
-
-            }
-        );
-
-
-        /* ======================================
-           TARGET LOST
-        ====================================== */
-
-        target.addEventListener(
-            "targetLost",
-            () => {
-
-                console.log(
-                    "LocalSync: TARGET LOST"
-                );
-
-            }
-        );
-
-
-        /* ======================================
+        /* ========================================
            WEBSITE
-        ====================================== */
+        ======================================== */
 
         websiteButton.addEventListener(
             "click",
@@ -994,9 +1135,9 @@
         );
 
 
-        /* ======================================
+        /* ========================================
            APP
-        ====================================== */
+        ======================================== */
 
         openAppButton.addEventListener(
             "click",
@@ -1022,6 +1163,10 @@
             }
         );
 
+
+        console.log(
+            "LocalSync AR: Three.js engine loaded"
+        );
 
     </script>
 
