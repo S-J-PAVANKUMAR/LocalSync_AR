@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,75 +12,129 @@
 
     <title>LocalSync AR</title>
 
-    <!-- A-Frame 1.5.0 -->
+
+    <!-- =========================================
+         A-FRAME
+    ========================================== -->
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <!-- MindAR 1.2.5 -->
+
+    <!-- =========================================
+         MINDAR
+    ========================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
+    <!-- =========================================
+         STYLES
+    ========================================== -->
+
     <style>
+
         html,
         body {
+
             margin: 0;
             padding: 0;
+
             width: 100%;
             height: 100%;
+
             overflow: hidden;
+
             background: #000;
+
         }
+
 
         a-scene {
+
             width: 100%;
             height: 100%;
+
         }
 
-        /* Bottom buttons */
+
+        /* =====================================
+           FIXED BUTTONS
+        ====================================== */
+
         #ui {
+
             position: fixed;
+
             left: 50%;
-            bottom: 25px;
+            bottom: 30px;
+
             transform: translateX(-50%);
 
             width: 220px;
 
             display: none;
-            flex-direction: column;
-            gap: 10px;
 
-            z-index: 100;
+            flex-direction: column;
+
+            gap: 12px;
+
+            z-index: 1000;
+
         }
 
+
         .button {
+
             width: 100%;
-            padding: 14px 10px;
+
+            padding: 15px 10px;
 
             border: none;
-            border-radius: 12px;
+
+            border-radius: 14px;
 
             color: white;
+
             font-size: 15px;
+
             font-weight: bold;
 
             cursor: pointer;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.35);
+
         }
+
 
         #openApp {
+
             background: #176dcc;
+
         }
+
 
         #website {
+
             background: #152b45;
+
         }
+
+
     </style>
+
 </head>
 
+
 <body>
+
 
     <!-- =========================================
          MINDAR AR SCENE
     ========================================== -->
 
     <a-scene
+
         mindar-image="
             imageTargetSrc: ./targets/localsync-card.mind;
             maxTrack: 1;
@@ -86,131 +142,164 @@
             uiScanning: yes;
             uiError: yes;
         "
-        color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-    >
 
-        <!-- CAMERA -->
-        <a-camera
-            position="0 0 0"
-            look-controls="enabled: false"
-        ></a-camera>
+        color-space="sRGB"
+
+        renderer="colorManagement: true, physicallyCorrectLights"
+
+        vr-mode-ui="enabled: false"
+
+        device-orientation-permission-ui="enabled: false"
+
+    >
 
 
         <!-- =====================================
-             LOCALSYNC CARD
+             CAMERA
+        ====================================== -->
+
+        <a-camera
+
+            position="0 0 0"
+
+            look-controls="enabled: false"
+
+        ></a-camera>
+
+
+
+        <!-- =====================================
+             LOCALSYNC TARGET
         ====================================== -->
 
         <a-entity
+
             id="localSyncTarget"
+
             mindar-image-target="targetIndex: 0"
+
         >
 
-            <!-- LOCALSYNC TITLE -->
+
+            <!-- =================================
+                 LOCALSYNC AR TITLE
+            ================================== -->
 
             <a-text
+
                 value="LocalSync"
+
                 position="0 0.20 0.10"
+
                 align="center"
+
                 width="0.90"
+
                 color="#8fd3ff"
+
                 side="double"
+
             ></a-text>
 
 
-            <!-- TAGLINE -->
+
+            <!-- =================================
+                 TAGLINE
+            ================================== -->
 
             <a-text
+
                 value="LOCAL • CONNECTED • SMART"
+
                 position="0 0.08 0.10"
+
                 align="center"
+
                 width="0.50"
+
                 color="#c5d3e0"
+
                 side="double"
+
             ></a-text>
 
-
-            <!-- OPEN APP BUTTON -->
-
-            <a-plane
-                position="0 -0.08 0.10"
-                width="0.65"
-                height="0.15"
-                color="#176dcc"
-            ></a-plane>
-
-            <a-text
-                value="OPEN APP"
-                position="0 -0.08 0.12"
-                align="center"
-                width="0.50"
-                color="#ffffff"
-                side="double"
-            ></a-text>
-
-
-            <!-- VISIT WEBSITE BUTTON -->
-
-            <a-plane
-                position="0 -0.27 0.10"
-                width="0.65"
-                height="0.15"
-                color="#152b45"
-            ></a-plane>
-
-            <a-text
-                value="VISIT WEBSITE"
-                position="0 -0.27 0.12"
-                align="center"
-                width="0.46"
-                color="#ffffff"
-                side="double"
-            ></a-text>
 
         </a-entity>
+
 
     </a-scene>
 
 
+
     <!-- =========================================
-         HTML FALLBACK BUTTONS
+         FIXED INTERACTIVE BUTTONS
     ========================================== -->
 
     <div id="ui">
 
-        <button
-            id="openApp"
-            class="button"
-        >
-            OPEN APP
-        </button>
+
+        <!-- OPEN APP -->
 
         <button
-            id="website"
+
+            id="openApp"
+
             class="button"
+
         >
-            VISIT WEBSITE
+
+            OPEN APP
+
         </button>
+
+
+
+        <!-- VISIT WEBSITE -->
+
+        <button
+
+            id="website"
+
+            class="button"
+
+        >
+
+            VISIT WEBSITE
+
+        </button>
+
 
     </div>
 
 
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
     <script>
 
+
         /* ========================================
-           LINKS
+           WEBSITE URL
         ======================================== */
 
         const WEBSITE_URL =
             "https://s-j-pavankumar.github.io/LocalSync_AR/website.html";
 
-        /*
-         * Real LocalSync app deep link
-         * will be added later.
-         */
+
+
+        /* ========================================
+           APP URL
+        ========================================
+
+           We will connect the real Flutter
+           app deep link later.
+
+        ======================================== */
+
         const APP_URL = "";
+
 
 
         /* ========================================
@@ -221,12 +310,14 @@
             document.querySelector("#localSyncTarget");
 
 
+
         /* ========================================
-           HTML UI
+           UI
         ======================================== */
 
         const ui =
             document.querySelector("#ui");
+
 
 
         /* ========================================
@@ -234,17 +325,22 @@
         ======================================== */
 
         target.addEventListener(
+
             "targetFound",
+
             () => {
 
                 console.log(
                     "LocalSync card detected"
                 );
 
+
                 ui.style.display = "flex";
 
             }
+
         );
+
 
 
         /* ========================================
@@ -252,45 +348,61 @@
         ======================================== */
 
         target.addEventListener(
+
             "targetLost",
+
             () => {
 
                 console.log(
                     "LocalSync card lost"
                 );
 
+
                 ui.style.display = "none";
 
             }
+
         );
 
 
+
         /* ========================================
-           WEBSITE BUTTON
+           VISIT WEBSITE
         ======================================== */
 
         document
+
             .querySelector("#website")
+
             .addEventListener(
+
                 "click",
+
                 () => {
 
                     window.location.href =
                         WEBSITE_URL;
 
                 }
+
             );
 
 
+
         /* ========================================
-           APP BUTTON
+           OPEN APP
         ======================================== */
 
         document
+
             .querySelector("#openApp")
+
             .addEventListener(
+
                 "click",
+
                 () => {
+
 
                     if (
                         APP_URL.trim() !== ""
@@ -299,7 +411,9 @@
                         window.location.href =
                             APP_URL;
 
-                    } else {
+                    }
+
+                    else {
 
                         alert(
                             "The LocalSync app link will be connected here."
@@ -307,10 +421,15 @@
 
                     }
 
+
                 }
+
             );
+
 
     </script>
 
+
 </body>
+
 </html>
