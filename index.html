@@ -10,15 +10,20 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
     <title>LocalSync AR</title>
 
 
-    <!-- A-Frame -->
+    <!-- A-FRAME -->
 
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
 
-    <!-- MindAR -->
+    <!-- MINDAR -->
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
@@ -41,21 +46,19 @@
         }
 
 
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT manually position the MindAR
-         * video or A-Frame canvas.
-         *
-         * MindAR handles this itself.
-         */
-
+        /* ======================================
+           START SCREEN
+        ====================================== */
 
         #startScreen {
 
             position: fixed;
 
-            inset: 0;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
 
             display: flex;
 
@@ -124,6 +127,8 @@
 
             cursor: pointer;
 
+            -webkit-tap-highlight-color: transparent;
+
         }
 
 
@@ -134,33 +139,122 @@
         }
 
 
-        #errorMessage {
+        /* ======================================
+           STATUS
+        ====================================== */
 
-            display: none;
+        #status {
 
             position: fixed;
 
+            top: 20px;
+
             left: 50%;
 
+            transform: translateX(-50%);
+
+            z-index: 9000;
+
+            display: none;
+
+            padding: 10px 16px;
+
+            border-radius: 20px;
+
+            background: rgba(0, 0, 0, 0.75);
+
+            color: white;
+
+            font-size: 13px;
+
+            text-align: center;
+
+            max-width: 85%;
+
+        }
+
+
+        /* ======================================
+           ERROR
+        ====================================== */
+
+        #errorBox {
+
+            position: fixed;
+
             top: 50%;
+            left: 50%;
 
             transform: translate(-50%, -50%);
 
-            width: 80%;
+            width: 82%;
 
-            max-width: 350px;
+            max-width: 360px;
 
-            padding: 20px;
+            padding: 22px;
 
-            border-radius: 15px;
+            border-radius: 18px;
 
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(5, 10, 16, 0.96);
 
             color: white;
 
             text-align: center;
 
             z-index: 10000;
+
+            display: none;
+
+        }
+
+
+        #errorBox h2 {
+
+            margin-top: 0;
+
+        }
+
+
+        #errorText {
+
+            color: #c5d3e0;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+
+            word-break: break-word;
+
+        }
+
+
+        #retryButton {
+
+            margin-top: 10px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            padding: 12px 24px;
+
+            background: #176dcc;
+
+            color: white;
+
+            font-weight: bold;
+
+        }
+
+
+        /* ======================================
+           A-FRAME
+        ====================================== */
+
+        a-scene {
+
+            width: 100%;
+            height: 100%;
 
         }
 
@@ -172,7 +266,7 @@
 <body>
 
 
-    <!-- =====================================
+    <!-- ======================================
          START SCREEN
     ====================================== -->
 
@@ -192,37 +286,36 @@
     </div>
 
 
-    <!-- =====================================
-         ERROR
+    <!-- ======================================
+         STATUS
     ====================================== -->
 
-    <div id="errorMessage">
+    <div id="status">
+        Starting camera...
+    </div>
 
-        <h3>Camera Error</h3>
+
+    <!-- ======================================
+         ERROR BOX
+    ====================================== -->
+
+    <div id="errorBox">
+
+        <h2>Camera Error</h2>
 
         <p id="errorText">
-            Unable to start AR camera.
+            Unable to start the camera.
         </p>
 
-        <button
-            onclick="location.reload()"
-            style="
-                border:none;
-                border-radius:10px;
-                padding:12px 22px;
-                background:#176dcc;
-                color:white;
-                font-weight:bold;
-            "
-        >
+        <button id="retryButton">
             TRY AGAIN
         </button>
 
     </div>
 
 
-    <!-- =====================================
-         MINDAR / A-FRAME
+    <!-- ======================================
+         MINDAR SCENE
     ====================================== -->
 
     <a-scene
@@ -260,7 +353,7 @@
         ></a-camera>
 
 
-        <!-- =================================
+        <!-- ==================================
              LOCALSYNC TARGET
         ================================== -->
 
@@ -347,7 +440,7 @@
             ></a-text>
 
 
-            <!-- WEBSITE -->
+            <!-- VISIT WEBSITE -->
 
             <a-plane
 
@@ -389,7 +482,7 @@
     </a-scene>
 
 
-    <!-- =====================================
+    <!-- ======================================
          JAVASCRIPT
     ====================================== -->
 
@@ -415,12 +508,20 @@
             document.querySelector("#startButton");
 
 
-        const errorMessage =
-            document.querySelector("#errorMessage");
+        const status =
+            document.querySelector("#status");
+
+
+        const errorBox =
+            document.querySelector("#errorBox");
 
 
         const errorText =
             document.querySelector("#errorText");
+
+
+        const retryButton =
+            document.querySelector("#retryButton");
 
 
         const websiteButton =
@@ -434,9 +535,9 @@
         let arSystem = null;
 
 
-        /*
-         * Wait for A-Frame
-         */
+        /* ======================================
+           GET MINDAR SYSTEM
+        ====================================== */
 
         scene.addEventListener(
             "loaded",
@@ -456,106 +557,360 @@
         );
 
 
-        /*
-         * START AR
-         */
+        /* ======================================
+           SHOW ERROR
+        ====================================== */
 
-        startButton.addEventListener(
-            "click",
-            async () => {
+        function showError(message) {
 
-                console.log(
-                    "LocalSync: START AR clicked"
+            console.error(
+                "LocalSync AR ERROR:",
+                message
+            );
+
+
+            status.style.display =
+                "none";
+
+
+            errorText.textContent =
+                message;
+
+
+            errorBox.style.display =
+                "block";
+
+        }
+
+
+        /* ======================================
+           HIDE ERROR
+        ====================================== */
+
+        function hideError() {
+
+            errorBox.style.display =
+                "none";
+
+        }
+
+
+        /* ======================================
+           FIND MINDAR VIDEO
+        ====================================== */
+
+        function getMindARVideo() {
+
+            const videos =
+                document.querySelectorAll(
+                    "video"
                 );
 
 
-                startButton.disabled = true;
+            console.log(
+                "LocalSync: videos found =",
+                videos.length
+            );
+
+
+            if (videos.length === 0) {
+
+                return null;
+
+            }
+
+
+            return videos[0];
+
+        }
+
+
+        /* ======================================
+           FORCE VIDEO PLAY
+        ====================================== */
+
+        async function forceVideoPlay() {
+
+            const video =
+                getMindARVideo();
+
+
+            if (!video) {
+
+                throw new Error(
+                    "MindAR started, but no camera video element was created."
+                );
+
+            }
+
+
+            console.log(
+                "LocalSync: video element found"
+            );
+
+
+            console.log(
+                "Video readyState:",
+                video.readyState
+            );
+
+
+            console.log(
+                "Video paused:",
+                video.paused
+            );
+
+
+            console.log(
+                "Video dimensions:",
+                video.videoWidth,
+                "x",
+                video.videoHeight
+            );
+
+
+            /*
+             * Mobile browser requirements
+             */
+
+            video.autoplay =
+                true;
+
+            video.muted =
+                true;
+
+            video.playsInline =
+                true;
+
+            video.setAttribute(
+                "autoplay",
+                ""
+            );
+
+            video.setAttribute(
+                "muted",
+                ""
+            );
+
+            video.setAttribute(
+                "playsinline",
+                ""
+            );
+
+
+            /*
+             * Explicitly play camera video.
+             */
+
+            try {
+
+                await video.play();
+
+                console.log(
+                    "LocalSync: video.play() SUCCESS"
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "LocalSync: video.play() FAILED",
+                    error
+                );
+
+
+                throw new Error(
+                    "Camera stream exists but the browser refused to play it: "
+                    +
+                    error.message
+                );
+
+            }
+
+
+            /*
+             * Verify actual video dimensions.
+             */
+
+            if (
+                video.videoWidth === 0 ||
+                video.videoHeight === 0
+            ) {
+
+                console.warn(
+                    "LocalSync: video has no dimensions yet."
+                );
+
+            }
+
+
+            return video;
+
+        }
+
+
+        /* ======================================
+           START AR
+        ====================================== */
+
+        async function startAR() {
+
+            hideError();
+
+
+            startButton.disabled =
+                true;
+
+
+            startButton.textContent =
+                "STARTING...";
+
+
+            status.style.display =
+                "block";
+
+
+            status.textContent =
+                "Requesting camera...";
+
+
+            try {
+
+
+                /*
+                 * Get MindAR system
+                 */
+
+                if (!arSystem) {
+
+                    arSystem =
+                        scene.systems[
+                            "mindar-image-system"
+                        ];
+
+                }
+
+
+                if (!arSystem) {
+
+                    throw new Error(
+                        "MindAR system could not be created."
+                    );
+
+                }
+
+
+                /*
+                 * Start MindAR
+                 */
+
+                console.log(
+                    "LocalSync: starting MindAR..."
+                );
+
+
+                await arSystem.start();
+
+
+                console.log(
+                    "LocalSync: MindAR start completed"
+                );
+
+
+                status.textContent =
+                    "Activating camera...";
+
+
+                /*
+                 * Give the video element
+                 * a moment to be created.
+                 */
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            300
+                        )
+                );
+
+
+                /*
+                 * Explicitly play video.
+                 */
+
+                await forceVideoPlay();
+
+
+                /*
+                 * Camera is now running.
+                 */
+
+                startScreen.style.display =
+                    "none";
+
+
+                status.style.display =
+                    "none";
+
+
+                console.log(
+                    "LocalSync: CAMERA ACTIVE"
+                );
+
+
+            }
+
+            catch (error) {
+
+                showError(
+                    error.message ||
+                    "Unable to start the camera."
+                );
+
+
+                startButton.disabled =
+                    false;
+
 
                 startButton.textContent =
-                    "STARTING...";
+                    "START AR";
+
+            }
+
+        }
 
 
-                try {
+        /* ======================================
+           START BUTTON
+        ====================================== */
+
+        startButton.addEventListener(
+            "click",
+            startAR
+        );
 
 
-                    /*
-                     * Get MindAR system
-                     */
+        /* ======================================
+           RETRY
+        ====================================== */
 
-                    if (!arSystem) {
+        retryButton.addEventListener(
+            "click",
+            () => {
 
-                        arSystem =
-                            scene.systems[
-                                "mindar-image-system"
-                            ];
+                hideError();
 
-                    }
-
-
-                    if (!arSystem) {
-
-                        throw new Error(
-                            "MindAR system not available."
-                        );
-
-                    }
-
-
-                    /*
-                     * Start MindAR
-                     */
-
-                    await arSystem.start();
-
-
-                    console.log(
-                        "LocalSync: camera started"
-                    );
-
-
-                    /*
-                     * Hide start screen
-                     */
-
-                    startScreen.style.display =
-                        "none";
-
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "LocalSync AR error:",
-                        error
-                    );
-
-
-                    errorText.textContent =
-                        error.message ||
-                        "Unable to start the AR camera.";
-
-
-                    errorMessage.style.display =
-                        "block";
-
-
-                    startButton.disabled =
-                        false;
-
-
-                    startButton.textContent =
-                        "START AR";
-
-                }
+                startAR();
 
             }
         );
 
 
-        /*
-         * AR READY
-         */
+        /* ======================================
+           AR READY
+        ====================================== */
 
         scene.addEventListener(
             "arReady",
@@ -569,13 +924,13 @@
         );
 
 
-        /*
-         * AR ERROR
-         */
+        /* ======================================
+           AR ERROR
+        ====================================== */
 
         scene.addEventListener(
             "arError",
-            (event) => {
+            event => {
 
                 console.error(
                     "LocalSync: AR ERROR",
@@ -586,9 +941,9 @@
         );
 
 
-        /*
-         * TARGET FOUND
-         */
+        /* ======================================
+           TARGET FOUND
+        ====================================== */
 
         const target =
             document.querySelector(
@@ -608,9 +963,9 @@
         );
 
 
-        /*
-         * TARGET LOST
-         */
+        /* ======================================
+           TARGET LOST
+        ====================================== */
 
         target.addEventListener(
             "targetLost",
@@ -624,9 +979,9 @@
         );
 
 
-        /*
-         * WEBSITE BUTTON
-         */
+        /* ======================================
+           WEBSITE
+        ====================================== */
 
         websiteButton.addEventListener(
             "click",
@@ -639,9 +994,9 @@
         );
 
 
-        /*
-         * APP BUTTON
-         */
+        /* ======================================
+           APP
+        ====================================== */
 
         openAppButton.addEventListener(
             "click",
