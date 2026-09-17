@@ -16,9 +16,67 @@
     <!-- MindAR 1.2.5 -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        a-scene {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Bottom buttons */
+        #ui {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            transform: translateX(-50%);
+
+            width: 220px;
+
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+
+            z-index: 100;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px 10px;
+
+            border: none;
+            border-radius: 12px;
+
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        #openApp {
+            background: #176dcc;
+        }
+
+        #website {
+            background: #152b45;
+        }
+    </style>
 </head>
 
 <body>
+
+    <!-- =========================================
+         MINDAR AR SCENE
+    ========================================== -->
 
     <a-scene
         mindar-image="
@@ -41,21 +99,218 @@
         ></a-camera>
 
 
-        <!-- LOCALSYNC CARD TARGET -->
+        <!-- =====================================
+             LOCALSYNC CARD
+        ====================================== -->
+
         <a-entity
+            id="localSyncTarget"
             mindar-image-target="targetIndex: 0"
         >
 
-            <!-- TEST OBJECT -->
-            <a-box
-                position="0 0 0.1"
-                scale="0.2 0.2 0.2"
-                color="#00ff88"
-            ></a-box>
+            <!-- LOCALSYNC TITLE -->
+
+            <a-text
+                value="LocalSync"
+                position="0 0.20 0.10"
+                align="center"
+                width="0.90"
+                color="#8fd3ff"
+                side="double"
+            ></a-text>
+
+
+            <!-- TAGLINE -->
+
+            <a-text
+                value="LOCAL • CONNECTED • SMART"
+                position="0 0.08 0.10"
+                align="center"
+                width="0.50"
+                color="#c5d3e0"
+                side="double"
+            ></a-text>
+
+
+            <!-- OPEN APP BUTTON -->
+
+            <a-plane
+                position="0 -0.08 0.10"
+                width="0.65"
+                height="0.15"
+                color="#176dcc"
+            ></a-plane>
+
+            <a-text
+                value="OPEN APP"
+                position="0 -0.08 0.12"
+                align="center"
+                width="0.50"
+                color="#ffffff"
+                side="double"
+            ></a-text>
+
+
+            <!-- VISIT WEBSITE BUTTON -->
+
+            <a-plane
+                position="0 -0.27 0.10"
+                width="0.65"
+                height="0.15"
+                color="#152b45"
+            ></a-plane>
+
+            <a-text
+                value="VISIT WEBSITE"
+                position="0 -0.27 0.12"
+                align="center"
+                width="0.46"
+                color="#ffffff"
+                side="double"
+            ></a-text>
 
         </a-entity>
 
     </a-scene>
+
+
+    <!-- =========================================
+         HTML FALLBACK BUTTONS
+    ========================================== -->
+
+    <div id="ui">
+
+        <button
+            id="openApp"
+            class="button"
+        >
+            OPEN APP
+        </button>
+
+        <button
+            id="website"
+            class="button"
+        >
+            VISIT WEBSITE
+        </button>
+
+    </div>
+
+
+    <script>
+
+        /* ========================================
+           LINKS
+        ======================================== */
+
+        const WEBSITE_URL =
+            "https://s-j-pavankumar.github.io/LocalSync_AR/website.html";
+
+        /*
+         * Real LocalSync app deep link
+         * will be added later.
+         */
+        const APP_URL = "";
+
+
+        /* ========================================
+           TARGET
+        ======================================== */
+
+        const target =
+            document.querySelector("#localSyncTarget");
+
+
+        /* ========================================
+           HTML UI
+        ======================================== */
+
+        const ui =
+            document.querySelector("#ui");
+
+
+        /* ========================================
+           CARD DETECTED
+        ======================================== */
+
+        target.addEventListener(
+            "targetFound",
+            () => {
+
+                console.log(
+                    "LocalSync card detected"
+                );
+
+                ui.style.display = "flex";
+
+            }
+        );
+
+
+        /* ========================================
+           CARD LOST
+        ======================================== */
+
+        target.addEventListener(
+            "targetLost",
+            () => {
+
+                console.log(
+                    "LocalSync card lost"
+                );
+
+                ui.style.display = "none";
+
+            }
+        );
+
+
+        /* ========================================
+           WEBSITE BUTTON
+        ======================================== */
+
+        document
+            .querySelector("#website")
+            .addEventListener(
+                "click",
+                () => {
+
+                    window.location.href =
+                        WEBSITE_URL;
+
+                }
+            );
+
+
+        /* ========================================
+           APP BUTTON
+        ======================================== */
+
+        document
+            .querySelector("#openApp")
+            .addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        APP_URL.trim() !== ""
+                    ) {
+
+                        window.location.href =
+                            APP_URL;
+
+                    } else {
+
+                        alert(
+                            "The LocalSync app link will be connected here."
+                        );
+
+                    }
+
+                }
+            );
+
+    </script>
 
 </body>
 </html>
