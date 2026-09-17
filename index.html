@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
     <title>LocalSync AR</title>
 
@@ -16,83 +19,236 @@
         body {
             margin: 0;
             overflow: hidden;
+            background: black;
         }
     </style>
 </head>
 
 <body>
 
-    <a-scene
-        mindar-image="
-            imageTargetSrc: ./targets/localsync-card.mind;
-            maxTrack: 1;
-            uiScanning: yes;
-            uiLoading: yes;
-        "
-        color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false">
+<a-scene
+    mindar-image="
+        imageTargetSrc: ./targets/localsync-card.mind;
+        maxTrack: 1;
+        uiScanning: yes;
+        uiLoading: yes;
+    "
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+>
 
-        <!-- Camera -->
-        <a-camera
-            position="0 0 0"
-            look-controls="enabled: false">
-        </a-camera>
+    <!-- Camera -->
+    <a-camera
+        position="0 0 0"
+        look-controls="enabled: false"
+    >
 
+        <!-- Mobile touch / mouse interaction -->
+        <a-entity
+            cursor="rayOrigin: mouse; fuse: false"
+            raycaster="objects: .clickable"
+        ></a-entity>
 
-        <!-- LocalSync AR Content -->
-        <a-entity mindar-image-target="targetIndex: 0">
-
-            <!-- LocalSync Title -->
-            <a-text
-                value="LocalSync"
-                position="0 0.35 0.1"
-                align="center"
-                color="#2ed39a"
-                width="1.8"
-                side="double">
-            </a-text>
+    </a-camera>
 
 
-            <!-- OPEN APP Button -->
-            <a-plane
-                position="0 -0.05 0.1"
-                width="1.5"
-                height="0.35"
-                color="#2ed39a">
-            </a-plane>
+    <!-- ================================================= -->
+    <!-- LOCALSYNC AR CONTENT -->
+    <!-- ================================================= -->
 
-            <a-text
-                value="OPEN APP"
-                position="0 -0.05 0.12"
-                align="center"
-                color="#07100d"
-                width="1.2"
-                side="double">
-            </a-text>
+    <a-entity mindar-image-target="targetIndex: 0">
 
 
-            <!-- VISIT WEBSITE Button -->
-            <a-plane
-                position="0 -0.50 0.1"
-                width="1.5"
-                height="0.35"
-                color="#111820">
-            </a-plane>
+        <!-- ============================================= -->
+        <!-- 3D-STYLE LOCALSYNC LOGO -->
+        <!-- ============================================= -->
 
-            <a-text
-                value="VISIT WEBSITE"
-                position="0 -0.50 0.12"
-                align="center"
-                color="#ffffff"
-                width="1.2"
-                side="double">
-            </a-text>
+        <!-- Shadow / depth layer -->
+        <a-text
+            value="LocalSync"
+            position="0.025 0.375 0.075"
+            align="center"
+            color="#061b2b"
+            width="2.0"
+            side="double"
+        ></a-text>
 
-        </a-entity>
+        <!-- Main logo -->
+        <a-text
+            value="LocalSync"
+            position="0 0.40 0.10"
+            align="center"
+            color="#00d9ff"
+            width="2.0"
+            side="double"
+        ></a-text>
 
-    </a-scene>
+
+        <!-- ============================================= -->
+        <!-- OPEN APP BUTTON -->
+        <!-- ============================================= -->
+
+        <!-- Button shadow -->
+        <a-plane
+            position="0.025 -0.075 0.075"
+            width="1.65"
+            height="0.40"
+            color="#061b2b"
+        ></a-plane>
+
+        <!-- Button -->
+        <a-plane
+            class="clickable"
+            id="openAppButton"
+            position="0 -0.05 0.10"
+            width="1.65"
+            height="0.40"
+            color="#00c98d"
+        ></a-plane>
+
+        <!-- Button text shadow -->
+        <a-text
+            value="OPEN APP"
+            position="0.015 -0.065 0.115"
+            align="center"
+            color="#062019"
+            width="1.25"
+            side="double"
+        ></a-text>
+
+        <!-- Button text -->
+        <a-text
+            value="OPEN APP"
+            position="0 -0.05 0.125"
+            align="center"
+            color="#ffffff"
+            width="1.25"
+            side="double"
+        ></a-text>
+
+
+        <!-- ============================================= -->
+        <!-- VISIT WEBSITE BUTTON -->
+        <!-- ============================================= -->
+
+        <!-- Button shadow -->
+        <a-plane
+            position="0.025 -0.525 0.075"
+            width="1.65"
+            height="0.40"
+            color="#061b2b"
+        ></a-plane>
+
+        <!-- Button -->
+        <a-plane
+            class="clickable"
+            id="websiteButton"
+            position="0 -0.50 0.10"
+            width="1.65"
+            height="0.40"
+            color="#123b68"
+        ></a-plane>
+
+        <!-- Button text shadow -->
+        <a-text
+            value="VISIT WEBSITE"
+            position="0.015 -0.515 0.115"
+            align="center"
+            color="#06101c"
+            width="1.05"
+            side="double"
+        ></a-text>
+
+        <!-- Button text -->
+        <a-text
+            value="VISIT WEBSITE"
+            position="0 -0.50 0.125"
+            align="center"
+            color="#ffffff"
+            width="1.05"
+            side="double"
+        ></a-text>
+
+    </a-entity>
+
+</a-scene>
+
+
+<script>
+
+    /*
+     * ==============================================
+     * LOCALSYNC LINKS
+     * ==============================================
+     */
+
+    const WEBSITE_URL =
+        "https://s-j-pavankumar.github.io/LocalSync_AR/website.html";
+
+
+    /*
+     * APP LINK
+     *
+     * We will put the real LocalSync app/deep-link here
+     * once your Flutter Android app has its final link.
+     *
+     * Do NOT invent or change this yet.
+     */
+
+    const APP_URL = "";
+
+
+    /*
+     * ==============================================
+     * WEBSITE BUTTON
+     * ==============================================
+     */
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const websiteButton =
+            document.querySelector("#websiteButton");
+
+        const openAppButton =
+            document.querySelector("#openAppButton");
+
+
+        /*
+         * VISIT WEBSITE
+         */
+
+        websiteButton.addEventListener("click", () => {
+
+            window.location.href = WEBSITE_URL;
+
+        });
+
+
+        /*
+         * OPEN APP
+         */
+
+        openAppButton.addEventListener("click", () => {
+
+            if (APP_URL.trim() !== "") {
+
+                window.location.href = APP_URL;
+
+            } else {
+
+                alert(
+                    "The LocalSync app link will be connected here."
+                );
+
+            }
+
+        });
+
+    });
+
+</script>
 
 </body>
 </html>
