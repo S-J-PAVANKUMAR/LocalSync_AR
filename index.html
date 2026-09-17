@@ -9,6 +9,8 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <title>LocalSync AR</title>
 
     <!-- A-Frame -->
@@ -17,154 +19,775 @@
     <!-- MindAR -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
     <style>
+
         html,
         body {
             margin: 0;
             padding: 0;
+
             width: 100%;
             height: 100%;
+
             overflow: hidden;
-            background: black;
+
+            background: #000;
+
+            font-family: Arial, sans-serif;
         }
+
+
+        /* --------------------------------
+           AR SCENE
+        -------------------------------- */
+
+        a-scene {
+            position: fixed !important;
+
+            top: 0 !important;
+            left: 0 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+            z-index: 1;
+        }
+
+
+        canvas {
+            position: fixed !important;
+
+            top: 0 !important;
+            left: 0 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+            z-index: 1;
+        }
+
+
+        /*
+         * MindAR creates the camera video dynamically.
+         * Force it to cover the entire screen.
+         */
+
+        video.mindar-video,
+        video[autoplay] {
+
+            position: fixed !important;
+
+            top: 0 !important;
+            left: 0 !important;
+
+            width: 100% !important;
+            height: 100% !important;
+
+            object-fit: cover !important;
+
+            z-index: 0 !important;
+        }
+
+
+        /* --------------------------------
+           START SCREEN
+        -------------------------------- */
+
+        #startScreen {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #10283b 0%,
+                    #050b12 55%,
+                    #000000 100%
+                );
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-direction: column;
+
+            z-index: 1000;
+
+            color: white;
+
+            text-align: center;
+        }
+
+
+        #startScreen h1 {
+
+            margin: 0 0 10px 0;
+
+            font-size: 32px;
+
+            letter-spacing: 1px;
+        }
+
+
+        #startScreen p {
+
+            margin: 0 25px 28px 25px;
+
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            color: #b8c7d4;
+        }
+
+
+        #startButton {
+
+            border: none;
+
+            border-radius: 14px;
+
+            padding: 15px 34px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: white;
+
+            background: #176dcc;
+
+            box-shadow:
+                0 8px 30px rgba(23, 109, 204, 0.35);
+
+            cursor: pointer;
+
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        #startButton:active {
+
+            transform: scale(0.96);
+        }
+
+
+        /* --------------------------------
+           STATUS
+        -------------------------------- */
+
+        #status {
+
+            position: fixed;
+
+            top: 20px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            z-index: 900;
+
+            display: none;
+
+            padding: 9px 16px;
+
+            border-radius: 20px;
+
+            background: rgba(0, 0, 0, 0.65);
+
+            color: white;
+
+            font-size: 13px;
+
+            white-space: nowrap;
+        }
+
+
+        /* --------------------------------
+           SCANNING MESSAGE
+        -------------------------------- */
+
+        #scanMessage {
+
+            position: fixed;
+
+            left: 50%;
+            bottom: 35px;
+
+            transform: translateX(-50%);
+
+            z-index: 800;
+
+            display: none;
+
+            color: white;
+
+            background: rgba(0, 0, 0, 0.55);
+
+            padding: 10px 18px;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+
+            text-align: center;
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
+
+    <!-- ==========================================
+         START SCREEN
+    =========================================== -->
+
+    <div id="startScreen">
+
+        <h1>LocalSync</h1>
+
+        <p>
+            Point your camera at the<br>
+            LocalSync business card
+        </p>
+
+        <button id="startButton">
+            START AR
+        </button>
+
+    </div>
+
+
+    <!-- ==========================================
+         STATUS
+    =========================================== -->
+
+    <div id="status">
+        Starting camera...
+    </div>
+
+
+    <div id="scanMessage">
+        Point the camera at your LocalSync card
+    </div>
+
+
+    <!-- ==========================================
+         AR SCENE
+    =========================================== -->
+
     <a-scene
+
+        id="arScene"
+
+        embedded
+
         mindar-image="
             imageTargetSrc: ./targets/localsync-card.mind;
             maxTrack: 1;
-            uiScanning: yes;
-            uiLoading: yes;
+            autoStart: false;
+            uiLoading: no;
+            uiError: no;
+            uiScanning: #scanMessage;
         "
+
         color-space="sRGB"
+
         renderer="colorManagement: true, physicallyCorrectLights"
+
         vr-mode-ui="enabled: false"
+
         device-orientation-permission-ui="enabled: false"
+
     >
+
 
         <!-- CAMERA -->
 
         <a-camera
+
             position="0 0 0"
+
             look-controls="enabled: false"
+
+            cursor="fuse: false; rayOrigin: mouse;"
+
+            raycaster="objects: .clickable"
+
+        ></a-camera>
+
+
+        <!-- ======================================
+             TARGET CONTENT
+        ======================================= -->
+
+        <a-entity
+            id="localSyncTarget"
+            mindar-image-target="targetIndex: 0"
         >
 
-            <a-entity
-                cursor="rayOrigin: mouse; fuse: false"
-                raycaster="objects: .clickable"
-            ></a-entity>
 
-        </a-camera>
-
-
-        <!-- AR TARGET -->
-
-        <a-entity mindar-image-target="targetIndex: 0">
-
-            <!-- LOCALSYNC -->
+            <!-- LOCALSYNC TITLE -->
 
             <a-text
+
                 value="LocalSync"
+
                 position="0 0.20 0.10"
+
                 align="center"
+
                 width="0.95"
+
                 color="#8fd3ff"
+
                 side="double"
+
             ></a-text>
 
 
             <!-- TAGLINE -->
 
             <a-text
+
                 value="LOCAL • CONNECTED • SMART"
+
                 position="0 0.08 0.10"
+
                 align="center"
+
                 width="0.55"
+
                 color="#c5d3e0"
+
                 side="double"
+
             ></a-text>
 
 
-            <!-- OPEN APP -->
+            <!-- OPEN APP BUTTON -->
 
             <a-plane
+
                 id="openAppButton"
+
                 class="clickable"
+
                 position="0 -0.08 0.10"
+
                 width="0.65"
+
                 height="0.15"
+
                 color="#1669c9"
+
             ></a-plane>
 
+
             <a-text
+
                 value="OPEN APP"
+
                 position="0 -0.08 0.12"
+
                 align="center"
+
                 width="0.52"
+
                 color="#ffffff"
+
                 side="double"
+
             ></a-text>
 
 
-            <!-- VISIT WEBSITE -->
+            <!-- VISIT WEBSITE BUTTON -->
 
             <a-plane
+
                 id="websiteButton"
+
                 class="clickable"
+
                 position="0 -0.27 0.10"
+
                 width="0.65"
+
                 height="0.15"
+
                 color="#152b45"
+
             ></a-plane>
 
+
             <a-text
+
                 value="VISIT WEBSITE"
+
                 position="0 -0.27 0.12"
+
                 align="center"
+
                 width="0.48"
+
                 color="#ffffff"
+
                 side="double"
+
             ></a-text>
+
 
         </a-entity>
+
 
     </a-scene>
 
 
-    <!-- JAVASCRIPT -->
+    <!-- ==========================================
+         JAVASCRIPT
+    =========================================== -->
 
     <script>
 
         const WEBSITE_URL =
             "https://s-j-pavankumar.github.io/LocalSync_AR/website.html";
 
+
+        /*
+         * Real Flutter deep link will be added later.
+         * Do not put a fake link here.
+         */
+
         const APP_URL = "";
 
 
-        document.addEventListener("DOMContentLoaded", () => {
-
-            const websiteButton =
-                document.querySelector("#websiteButton");
-
-            const openAppButton =
-                document.querySelector("#openAppButton");
+        const scene =
+            document.querySelector("#arScene");
 
 
-            websiteButton.addEventListener("click", () => {
-
-                window.location.href = WEBSITE_URL;
-
-            });
+        const startScreen =
+            document.querySelector("#startScreen");
 
 
-            openAppButton.addEventListener("click", () => {
+        const startButton =
+            document.querySelector("#startButton");
 
-                if (APP_URL.trim() !== "") {
 
-                    window.location.href = APP_URL;
+        const status =
+            document.querySelector("#status");
+
+
+        const scanMessage =
+            document.querySelector("#scanMessage");
+
+
+        const openAppButton =
+            document.querySelector("#openAppButton");
+
+
+        const websiteButton =
+            document.querySelector("#websiteButton");
+
+
+        /*
+         * MindAR system
+         */
+
+        let arSystem = null;
+
+
+        /*
+         * Wait until A-Frame has finished loading.
+         */
+
+        scene.addEventListener("loaded", () => {
+
+            arSystem =
+                scene.systems["mindar-image-system"];
+
+            console.log("LocalSync: A-Frame loaded");
+
+        });
+
+
+        /*
+         * START AR
+         *
+         * IMPORTANT:
+         * Camera starts only after the user
+         * physically taps START AR.
+         */
+
+        startButton.addEventListener("click", async () => {
+
+            console.log("LocalSync: START AR clicked");
+
+
+            startButton.disabled = true;
+
+            startButton.textContent =
+                "STARTING...";
+
+
+            status.style.display = "block";
+
+            status.textContent =
+                "Starting camera...";
+
+
+            try {
+
+                /*
+                 * Wait for MindAR system
+                 */
+
+                if (!arSystem) {
+
+                    arSystem =
+                        scene.systems["mindar-image-system"];
+
+                }
+
+
+                if (!arSystem) {
+
+                    throw new Error(
+                        "MindAR system was not created."
+                    );
+
+                }
+
+
+                /*
+                 * Start MindAR manually.
+                 */
+
+                await arSystem.start();
+
+
+                console.log(
+                    "LocalSync: MindAR started"
+                );
+
+
+                /*
+                 * Hide start screen.
+                 */
+
+                startScreen.style.display =
+                    "none";
+
+
+                status.style.display =
+                    "none";
+
+
+                scanMessage.style.display =
+                    "block";
+
+
+                /*
+                 * Force camera video styling
+                 * after MindAR creates it.
+                 */
+
+                setTimeout(() => {
+
+                    const videos =
+                        document.querySelectorAll(
+                            "video"
+                        );
+
+
+                    videos.forEach((video) => {
+
+                        video.style.position =
+                            "fixed";
+
+                        video.style.top =
+                            "0";
+
+                        video.style.left =
+                            "0";
+
+                        video.style.width =
+                            "100%";
+
+                        video.style.height =
+                            "100%";
+
+                        video.style.objectFit =
+                            "cover";
+
+                        video.setAttribute(
+                            "playsinline",
+                            ""
+                        );
+
+                    });
+
+                }, 500);
+
+
+            } catch (error) {
+
+                console.error(
+                    "LocalSync AR start error:",
+                    error
+                );
+
+
+                status.style.display =
+                    "block";
+
+
+                status.textContent =
+                    "Camera could not start.";
+
+
+                startButton.disabled =
+                    false;
+
+
+                startButton.textContent =
+                    "TRY AGAIN";
+
+
+                alert(
+                    "LocalSync AR could not start the camera. Please try again."
+                );
+
+            }
+
+        });
+
+
+        /*
+         * MindAR ready
+         */
+
+        scene.addEventListener(
+            "arReady",
+            () => {
+
+                console.log(
+                    "LocalSync: AR READY"
+                );
+
+                status.style.display =
+                    "none";
+
+            }
+        );
+
+
+        /*
+         * MindAR error
+         */
+
+        scene.addEventListener(
+            "arError",
+            (event) => {
+
+                console.error(
+                    "LocalSync: AR ERROR",
+                    event
+                );
+
+                status.style.display =
+                    "block";
+
+                status.textContent =
+                    "AR could not initialize.";
+
+            }
+        );
+
+
+        /*
+         * TARGET FOUND
+         */
+
+        const target =
+            document.querySelector(
+                "#localSyncTarget"
+            );
+
+
+        target.addEventListener(
+            "targetFound",
+            () => {
+
+                console.log(
+                    "LocalSync: TARGET FOUND"
+                );
+
+                scanMessage.style.display =
+                    "none";
+
+            }
+        );
+
+
+        /*
+         * TARGET LOST
+         */
+
+        target.addEventListener(
+            "targetLost",
+            () => {
+
+                console.log(
+                    "LocalSync: TARGET LOST"
+                );
+
+                scanMessage.style.display =
+                    "block";
+
+            }
+        );
+
+
+        /*
+         * VISIT WEBSITE
+         */
+
+        websiteButton.addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    WEBSITE_URL;
+
+            }
+        );
+
+
+        /*
+         * OPEN APP
+         */
+
+        openAppButton.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    APP_URL.trim() !== ""
+                ) {
+
+                    window.location.href =
+                        APP_URL;
 
                 } else {
 
@@ -174,11 +797,11 @@
 
                 }
 
-            });
-
-        });
+            }
+        );
 
     </script>
+
 
 </body>
 
