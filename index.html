@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,22 +12,30 @@
 
     <title>LocalSync AR</title>
 
+
     <!-- A-Frame -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+
 
     <!-- MindAR -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
     <style>
+
         body {
             margin: 0;
             overflow: hidden;
             background: black;
         }
+
     </style>
+
 </head>
 
+
 <body>
+
 
 <a-scene
     mindar-image="
@@ -34,245 +44,210 @@
         uiScanning: yes;
         uiLoading: yes;
     "
+
     color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights"
+
+    renderer="
+        colorManagement: true;
+        physicallyCorrectLights;
+    "
+
     vr-mode-ui="enabled: false"
+
     device-orientation-permission-ui="enabled: false"
 >
 
+
+    <!-- ========================================= -->
     <!-- CAMERA -->
+    <!-- ========================================= -->
 
     <a-camera
         position="0 0 0"
-        look-controls="enabled: false">
+        look-controls="enabled: false"
+    >
 
         <a-entity
             cursor="rayOrigin: mouse; fuse: false"
-            raycaster="objects: .clickable">
-        </a-entity>
+            raycaster="objects: .clickable"
+        ></a-entity>
 
     </a-camera>
 
 
-    <!-- ================================================= -->
-    <!-- LOCALSYNC AR -->
-    <!-- ================================================= -->
 
-    <a-entity mindar-image-target="targetIndex: 0">
+    <!-- ========================================= -->
+    <!-- LOCALSYNC TARGET -->
+    <!-- ========================================= -->
 
-
-        <!-- ================================================= -->
-        <!-- 3D LOCALSYNC WORDMARK -->
-        <!-- ================================================= -->
-
-        <a-entity
-            position="0 0.42 0.10"
-            scale="1 1 1"
-            animation="
-                property: position;
-                from: 0 0.39 0.10;
-                to: 0 0.45 0.10;
-                dur: 1800;
-                dir: alternate;
-                loop: true;
-                easing: easeInOutSine;
-            "
-        >
-
-            <!-- Deep extrusion -->
-            <a-text
-                value="LocalSync"
-                position="-0.045 -0.045 -0.020"
-                align="center"
-                width="2.15"
-                color="#07111f"
-                side="double">
-            </a-text>
-
-            <a-text
-                value="LocalSync"
-                position="-0.040 -0.040 -0.015"
-                align="center"
-                width="2.15"
-                color="#0b1d32"
-                side="double">
-            </a-text>
-
-            <a-text
-                value="LocalSync"
-                position="-0.035 -0.035 -0.010"
-                align="center"
-                width="2.15"
-                color="#102c49"
-                side="double">
-            </a-text>
-
-            <a-text
-                value="LocalSync"
-                position="-0.030 -0.030 -0.005"
-                align="center"
-                width="2.15"
-                color="#163c61"
-                side="double">
-            </a-text>
-
-            <a-text
-                value="LocalSync"
-                position="-0.025 -0.025 0"
-                align="center"
-                width="2.15"
-                color="#1d527f"
-                side="double">
-            </a-text>
+    <a-entity
+        mindar-image-target="targetIndex: 0"
+    >
 
 
-            <!-- Main metallic face -->
-            <a-text
-                value="LocalSync"
-                position="0 0 0.03"
-                align="center"
-                width="2.15"
-                color="#f4f7fa"
-                side="double">
-            </a-text>
+        <!-- ===================================== -->
+        <!-- LOCALSYNC LOGO -->
+        <!-- ===================================== -->
+
+        <!-- Subtle shadow -->
+        <a-text
+            value="LocalSync"
+            position="0.012 0.205 0.075"
+            align="center"
+            width="1.05"
+            color="#172638"
+            side="double"
+        ></a-text>
 
 
-            <!-- Blue face highlight -->
-            <a-text
-                value="LocalSync"
-                position="0 0.012 0.035"
-                align="center"
-                width="2.15"
-                color="#d7ecff"
-                side="double">
-            </a-text>
+        <!-- Main logo -->
+        <a-text
+            value="LocalSync"
+            position="0 0.22 0.10"
+            align="center"
+            width="1.05"
+            color="#e8f2ff"
+            side="double"
+        ></a-text>
 
 
-            <!-- Thin blue glow underneath -->
-            <a-text
-                value="LocalSync"
-                position="0 0.025 0.025"
-                align="center"
-                width="2.15"
-                color="#2498ff"
-                opacity="0.30"
-                side="double">
-            </a-text>
-
-        </a-entity>
+        <!-- Small blue highlight -->
+        <a-text
+            value="LocalSync"
+            position="0 0.225 0.105"
+            align="center"
+            width="1.05"
+            color="#8fd3ff"
+            opacity="0.55"
+            side="double"
+        ></a-text>
 
 
-        <!-- ================================================= -->
-        <!-- SMALL TAGLINE -->
-        <!-- ================================================= -->
+
+        <!-- ===================================== -->
+        <!-- TAGLINE -->
+        <!-- ===================================== -->
 
         <a-text
             value="LOCAL • CONNECTED • SMART"
-            position="0 0.05 0.10"
+            position="0 0.095 0.10"
             align="center"
-            width="1.15"
-            color="#b8c7d8"
-            side="double">
-        </a-text>
+            width="0.65"
+            color="#9fb2c5"
+            side="double"
+        ></a-text>
 
 
-        <!-- ================================================= -->
+
+        <!-- ===================================== -->
         <!-- OPEN APP BUTTON -->
-        <!-- ================================================= -->
+        <!-- ===================================== -->
 
         <!-- Shadow -->
         <a-plane
-            position="0.025 -0.30 0.06"
-            width="1.70"
-            height="0.40"
-            color="#050b13">
-        </a-plane>
+            position="0.012 -0.075 0.075"
+            width="0.72"
+            height="0.16"
+            color="#07111d"
+        ></a-plane>
 
-        <!-- Main button -->
+
+        <!-- Button -->
         <a-plane
             class="clickable"
             id="openAppButton"
-            position="0 -0.27 0.10"
-            width="1.70"
-            height="0.40"
-            color="#1669c9">
-        </a-plane>
+            position="0 -0.06 0.10"
+            width="0.72"
+            height="0.16"
+            color="#1669c9"
+        ></a-plane>
 
-        <!-- Highlight strip -->
+
+        <!-- Button highlight -->
         <a-plane
-            position="0  -0.085 0.115"
-            width="1.45"
-            height="0.015"
-            color="#7dc4ff"
-            opacity="0.65">
-        </a-plane>
+            position="0 0.005 0.115"
+            width="0.62"
+            height="0.008"
+            color="#8acbff"
+            opacity="0.75"
+        ></a-plane>
+
 
         <!-- Button text -->
         <a-text
             value="OPEN APP"
-            position="0 -0.27 0.125"
+            position="0 -0.06 0.125"
             align="center"
-            width="1.15"
+            width="0.60"
             color="#ffffff"
-            side="double">
-        </a-text>
+            side="double"
+        ></a-text>
 
 
-        <!-- ================================================= -->
+
+        <!-- ===================================== -->
         <!-- VISIT WEBSITE BUTTON -->
-        <!-- ================================================= -->
+        <!-- ===================================== -->
 
         <!-- Shadow -->
         <a-plane
-            position="0.025 -0.78 0.06"
-            width="1.70"
-            height="0.40"
-            color="#050b13">
-        </a-plane>
+            position="0.012 -0.285 0.075"
+            width="0.72"
+            height="0.16"
+            color="#07111d"
+        ></a-plane>
 
-        <!-- Main button -->
+
+        <!-- Button -->
         <a-plane
             class="clickable"
             id="websiteButton"
-            position="0 -0.75 0.10"
-            width="1.70"
-            height="0.40"
-            color="#101d2d">
-        </a-plane>
+            position="0 -0.27 0.10"
+            width="0.72"
+            height="0.16"
+            color="#152b45"
+        ></a-plane>
 
-        <!-- Blue border/highlight -->
+
+        <!-- Button highlight -->
         <a-plane
-            position="0 -0.57 0.115"
-            width="1.45"
-            height="0.015"
+            position="0 -0.205 0.115"
+            width="0.62"
+            height="0.008"
             color="#2498ff"
-            opacity="0.8">
-        </a-plane>
+            opacity="0.80"
+        ></a-plane>
+
 
         <!-- Button text -->
         <a-text
             value="VISIT WEBSITE"
-            position="0 -0.75 0.125"
+            position="0 -0.27 0.125"
             align="center"
-            width="1.05"
+            width="0.52"
             color="#ffffff"
-            side="double">
-        </a-text>
+            side="double"
+        ></a-text>
 
 
     </a-entity>
 
+
 </a-scene>
 
 
-<!-- ===================================================== -->
+
+<!-- ============================================= -->
 <!-- JAVASCRIPT -->
-<!-- ===================================================== -->
+<!-- ============================================= -->
 
 <script>
 
+
     /*
+     * ============================================
      * LOCALSYNC WEBSITE
+     * ============================================
      */
 
     const WEBSITE_URL =
@@ -280,25 +255,38 @@
 
 
     /*
+     * ============================================
      * LOCALSYNC APP
      *
-     * We will connect the real Flutter app here later.
+     * We will add the real Flutter deep link
+     * after the Android app link is ready.
+     * ============================================
      */
 
     const APP_URL = "";
 
 
+
+    /*
+     * ============================================
+     * BUTTON INTERACTION
+     * ============================================
+     */
+
     document.addEventListener("DOMContentLoaded", () => {
+
 
         const websiteButton =
             document.querySelector("#websiteButton");
+
 
         const openAppButton =
             document.querySelector("#openAppButton");
 
 
+
         /*
-         * WEBSITE
+         * WEBSITE BUTTON
          */
 
         websiteButton.addEventListener("click", () => {
@@ -308,8 +296,9 @@
         });
 
 
+
         /*
-         * APP
+         * OPEN APP BUTTON
          */
 
         openAppButton.addEventListener("click", () => {
@@ -321,16 +310,19 @@
             } else {
 
                 alert(
-                    "LocalSync App will be connected here."
+                    "The LocalSync app link will be connected here."
                 );
 
             }
 
         });
 
+
     });
 
 </script>
 
+
 </body>
+
 </html>
