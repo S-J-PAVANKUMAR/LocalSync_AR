@@ -7,16 +7,23 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, user-scalable=no"
     >
 
     <title>LocalSync AR</title>
 
 
-    <!-- A-Frame 1.5.0 -->
+    <!-- =========================================
+         A-FRAME 1.5.0
+    ========================================== -->
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <!-- MindAR 1.2.5 -->
+
+    <!-- =========================================
+         MINDAR 1.2.5
+    ========================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 
@@ -34,6 +41,16 @@
             overflow: hidden;
 
             background: #000;
+
+            touch-action: none;
+
+        }
+
+
+        a-scene {
+
+            width: 100%;
+            height: 100%;
 
         }
 
@@ -71,32 +88,18 @@
 
 
         <!-- =====================================
-             CAMERA + MOBILE CURSOR
+             CAMERA
         ====================================== -->
 
         <a-camera
+
+            id="arCamera"
 
             position="0 0 0"
 
             look-controls="enabled: false"
 
-        >
-
-            <!--
-                A-Frame cursor creates the
-                synthetic click events used
-                by our AR buttons.
-            -->
-
-            <a-cursor
-
-                fuse="false"
-
-                raycaster="objects: .ar-button; far: 10"
-
-            ></a-cursor>
-
-        </a-camera>
+        ></a-camera>
 
 
 
@@ -271,7 +274,9 @@
 
 
         /* ========================================
-           APP URL
+           FLUTTER APP URL
+
+           We will add the real deep link later.
         ======================================== */
 
         const APP_URL = "";
@@ -279,11 +284,16 @@
 
 
         /* ========================================
-           AR BUTTONS
+           A-FRAME SCENE
         ======================================== */
+
+        const scene =
+            document.querySelector("a-scene");
+
 
         const openAppButton =
             document.querySelector("#openAppAR");
+
 
         const websiteButton =
             document.querySelector("#websiteAR");
@@ -291,21 +301,198 @@
 
 
         /* ========================================
-           OPEN APP
+           THREE.JS RAYCASTER
         ======================================== */
 
-        openAppButton.addEventListener(
+        const raycaster =
+            new THREE.Raycaster();
 
-            "click",
 
-            () => {
+        const touchPoint =
+            new THREE.Vector2();
 
-                console.log(
-                    "LocalSync AR: OPEN APP clicked"
+
+
+        /* ========================================
+           FIND AR BUTTON FROM
+           INTERSECTED THREE.JS OBJECT
+        ======================================== */
+
+        function findARButton(object) {
+
+            let current =
+                object;
+
+
+            while (current) {
+
+                if (
+                    current.el &&
+                    current.el.classList &&
+                    current.el.classList.contains(
+                        "ar-button"
+                    )
+                ) {
+
+                    return current.el;
+
+                }
+
+
+                current =
+                    current.parent;
+
+            }
+
+
+            return null;
+
+        }
+
+
+
+        /* ========================================
+           HANDLE PHONE TOUCH
+        ======================================== */
+
+        function handleTouch(event) {
+
+            if (!scene.canvas) {
+
+                return;
+
+            }
+
+
+            if (
+                !scene.camera
+            ) {
+
+                return;
+
+            }
+
+
+            const touch =
+                event.changedTouches[0];
+
+
+            const rect =
+                scene.canvas.getBoundingClientRect();
+
+
+            /* Convert phone touch
+               into normalized
+               device coordinates */
+
+            touchPoint.x =
+                (
+                    (touch.clientX - rect.left)
+                    /
+                    rect.width
+                ) * 2 - 1;
+
+
+            touchPoint.y =
+                -(
+                    (touch.clientY - rect.top)
+                    /
+                    rect.height
+                ) * 2 + 1;
+
+
+
+            /* Create ray from camera */
+
+            raycaster.setFromCamera(
+                touchPoint,
+                scene.camera
+            );
+
+
+
+            /* Find AR button objects */
+
+            const buttons = [
+
+                openAppButton.object3D,
+
+                websiteButton.object3D
+
+            ];
+
+
+
+            const intersections =
+                raycaster.intersectObjects(
+                    buttons,
+                    true
                 );
 
 
-                if (APP_URL.trim() !== "") {
+
+            if (
+                intersections.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+
+            /* Find which AR button
+               was touched */
+
+            const button =
+                findARButton(
+                    intersections[0].object
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+
+            /* Stop browser handling */
+
+            event.preventDefault();
+
+
+
+            /* Trigger button action */
+
+            if (
+                button.id === "websiteAR"
+            ) {
+
+                console.log(
+                    "LocalSync AR: VISIT WEBSITE tapped"
+                );
+
+
+                window.location.href =
+                    WEBSITE_URL;
+
+            }
+
+
+            else if (
+                button.id === "openAppAR"
+            ) {
+
+                console.log(
+                    "LocalSync AR: OPEN APP tapped"
+                );
+
+
+                if (
+                    APP_URL.trim() !== ""
+                ) {
 
                     window.location.href =
                         APP_URL;
@@ -322,100 +509,42 @@
 
             }
 
-        );
+        }
 
 
 
         /* ========================================
-           VISIT WEBSITE
+           WAIT FOR A-FRAME TO LOAD
         ======================================== */
 
-        websiteButton.addEventListener(
+        scene.addEventListener(
 
-            "click",
+            "loaded",
 
             () => {
 
                 console.log(
-                    "LocalSync AR: VISIT WEBSITE clicked"
+                    "LocalSync AR scene loaded"
                 );
 
 
-                window.location.href =
-                    WEBSITE_URL;
+                /* Touch listener */
 
-            }
+                scene.canvas.addEventListener(
 
-        );
+                    "touchend",
 
+                    handleTouch,
 
+                    {
+                        passive: false
+                    }
 
-        /* ========================================
-           OPEN APP HOVER / POINTER FEEDBACK
-        ======================================== */
-
-        openAppButton.addEventListener(
-
-            "mouseenter",
-
-            () => {
-
-                openAppButton.setAttribute(
-                    "color",
-                    "#2385e8"
                 );
 
-            }
 
-        );
-
-
-        openAppButton.addEventListener(
-
-            "mouseleave",
-
-            () => {
-
-                openAppButton.setAttribute(
-                    "color",
-                    "#176dcc"
-                );
-
-            }
-
-        );
-
-
-
-        /* ========================================
-           WEBSITE HOVER / POINTER FEEDBACK
-        ======================================== */
-
-        websiteButton.addEventListener(
-
-            "mouseenter",
-
-            () => {
-
-                websiteButton.setAttribute(
-                    "color",
-                    "#244566"
-                );
-
-            }
-
-        );
-
-
-        websiteButton.addEventListener(
-
-            "mouseleave",
-
-            () => {
-
-                websiteButton.setAttribute(
-                    "color",
-                    "#152b45"
+                console.log(
+                    "LocalSync AR touch interaction ready"
                 );
 
             }
