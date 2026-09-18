@@ -266,7 +266,7 @@
 
 
         /* ========================================
-           WEBSITE URL
+           LOCALSYNC WEBSITE
         ======================================== */
 
         const WEBSITE_URL =
@@ -274,12 +274,11 @@
 
 
         /* ========================================
-           FLUTTER APP URL
-
-           We will add the real deep link later.
+           LOCALSYNC APK DOWNLOAD
         ======================================== */
 
-        const APP_URL = "";
+        const APP_URL =
+            "https://github.com/S-J-PAVANKUMAR/LocalSync_AR/releases/download/v1.0.0/app-release.apk";
 
 
 
@@ -314,8 +313,7 @@
 
 
         /* ========================================
-           FIND AR BUTTON FROM
-           INTERSECTED THREE.JS OBJECT
+           FIND AR BUTTON
         ======================================== */
 
         function findARButton(object) {
@@ -352,7 +350,7 @@
 
 
         /* ========================================
-           HANDLE PHONE TOUCH
+           PHONE TOUCH HANDLER
         ======================================== */
 
         function handleTouch(event) {
@@ -364,9 +362,7 @@
             }
 
 
-            if (
-                !scene.camera
-            ) {
+            if (!scene.camera) {
 
                 return;
 
@@ -381,9 +377,8 @@
                 scene.canvas.getBoundingClientRect();
 
 
-            /* Convert phone touch
-               into normalized
-               device coordinates */
+            /* Convert touch position
+               to normalized coordinates */
 
             touchPoint.x =
                 (
@@ -411,7 +406,7 @@
 
 
 
-            /* Find AR button objects */
+            /* AR buttons */
 
             const buttons = [
 
@@ -422,6 +417,8 @@
             ];
 
 
+
+            /* Check intersection */
 
             const intersections =
                 raycaster.intersectObjects(
@@ -441,8 +438,7 @@
 
 
 
-            /* Find which AR button
-               was touched */
+            /* Identify button */
 
             const button =
                 findARButton(
@@ -458,15 +454,35 @@
 
 
 
-            /* Stop browser handling */
-
             event.preventDefault();
 
 
 
-            /* Trigger button action */
+            /* =================================
+               OPEN APP
+            ================================= */
 
             if (
+                button.id === "openAppAR"
+            ) {
+
+                console.log(
+                    "LocalSync AR: OPEN APP tapped"
+                );
+
+
+                window.location.href =
+                    APP_URL;
+
+            }
+
+
+
+            /* =================================
+               WEBSITE
+            ================================= */
+
+            else if (
                 button.id === "websiteAR"
             ) {
 
@@ -480,41 +496,12 @@
 
             }
 
-
-            else if (
-                button.id === "openAppAR"
-            ) {
-
-                console.log(
-                    "LocalSync AR: OPEN APP tapped"
-                );
-
-
-                if (
-                    APP_URL.trim() !== ""
-                ) {
-
-                    window.location.href =
-                        APP_URL;
-
-                }
-
-                else {
-
-                    alert(
-                        "The LocalSync app link will be connected here."
-                    );
-
-                }
-
-            }
-
         }
 
 
 
         /* ========================================
-           WAIT FOR A-FRAME TO LOAD
+           WAIT FOR SCENE
         ======================================== */
 
         scene.addEventListener(
@@ -527,8 +514,6 @@
                     "LocalSync AR scene loaded"
                 );
 
-
-                /* Touch listener */
 
                 scene.canvas.addEventListener(
 
